@@ -8,6 +8,8 @@
 -- with Ada.Unchecked_Conversion;
 
 package UCA is
+   pragma Preelaborate;
+
    type Octets is mod 2 ** 8 with
      Size => 8;
 
