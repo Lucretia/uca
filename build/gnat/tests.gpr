@@ -1,0 +1,11 @@
+with "uca.gpr";
+with "ahven.gpr";
+
+project Unit_Tests is
+   for Source_Dirs use ("../../tests");
+   for Object_Dir  use "gen/" & UCA.Mode & "/tests/.obj";
+   for Exec_Dir    use "gen/" & UCA.Mode & "/tests";
+   for Main        use ("uca-test_runner.adb");
+
+   package Compiler renames UCA.Compiler;
+end Unit_Tests;
