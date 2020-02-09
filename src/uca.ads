@@ -6,9 +6,12 @@
 --  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ------------------------------------------------------------------------------------------------------------------------
 -- with Ada.Unchecked_Conversion;
+with Ada.Iterator_Interfaces;
 
 package UCA is
-   pragma Preelaborate;
+   -- pragma Preelaborate;
+
+   Unicode_Parse_Error : exception;
 
    type Octets is mod 2 ** 8 with
      Size => 8;
@@ -17,6 +20,7 @@ package UCA is
      Pack => True;
 
    type Unicode_String_Access is access all Unicode_String;
+   type Unicode_String_Constant_Access is access constant Unicode_String;
 
    type All_Code_Points is mod 2 ** 32 with
      Size => 32;
@@ -28,10 +32,30 @@ package UCA is
    --  This should match Wide_Wide_Character in size.
    --    See 3.9 of the standard for the range.
    --      The range is 0 .. 10_FFFF
-   type Code_Points is new All_Code_Points with
+   type Code_Points is new All_Code_Points range 0 .. 16#0010_FFFF# with
      Static_Predicate => All_Code_Points (Code_Points) not in High_Surrogates and
                          All_Code_Points (Code_Points) not in Low_Surrogates,
      Size             => 32;
+
+   type Unicode_Cursor is limited private;
+
+   function Has_Element (Position : in Unicode_Cursor) return Boolean;
+
+   package Unicode_Iterators is new Ada.Iterator_Interfaces (Unicode_Cursor, Has_Element);
+
+   --  Provide a way to do user-defined iteration.
+   type Unicode_Reference (Container : access constant Unicode_String) is tagged null record with
+     Implicit_Dereference => Container,
+     Default_Iterator     => Iterate,
+     Iterator_Element     => Code_Points,
+     Constant_Indexing    => Element_Value;
+
+   function Iterate (Container : in Unicode_Reference) return Unicode_Iterators.Forward_Iterator'Class;
+
+   function Element_Value (Container : in Unicode_Reference; Position : in Unicode_Cursor) return Code_Points;
+
+   function Element (Position : in Unicode_Cursor) return Code_Points;
+
 private
    --  No. of bytes | Bits for code point | First   | Last     |  Byte 1  |  Byte 2  |  Byte 3  |  Byte 4
    --        1      |           7         | U+0000  | U+007F   | 0wwwwwww |
@@ -53,115 +77,35 @@ private
    Octet_Header_Mask_Four  : constant Octets := 2#1111_1000#;
    Octet_Follower_Mask     : constant Octets := 2#1100_0000#;
 
-   --  Mask to get the data from an octet.
-   Octet_Mask_One          : constant Octets := 2#0111_1111#;
-   Octet_Mask_Two          : constant Octets := 2#0001_1111#;
-   Octet_Mask_Three        : constant Octets := 2#0000_1111#;
-   Octet_Mask_Four         : constant Octets := 2#0000_0111#;
+   Octet_Header_One   : constant Octets := 2#0000_0000#;
+   Octet_Header_Two   : constant Octets := 2#1100_0000#;
+   Octet_Header_Three : constant Octets := 2#1110_0000#;
+   Octet_Header_Four  : constant Octets := 2#1111_0000#;
+   Octet_Follower     : constant Octets := 2#1000_0000#;
 
---     --  Various representations of code points.
---     type Code_Point_Data is mod 2 ** 32 with
---       Static_Predicate => Code_Point in 0 .. 16#0010_FFFF#,
---       Size             => 32;
---
---     type Code_Point_1 is
---        record
---           Zero : Natural;  --  Should always be zero!
---           Data : Natural;  --  Octet_1
---        end record with
---       Convention => C,
---       Size       => Code_Point_Data'Size;
---
---     for Code_Point_1 use
---        record
---           Zero at 0 range 7 .. 31;
---           Data at 0 range 0 .. 6;
---        end record;
---
---     type Code_Point_2 is
---        record
---           Zero   : Natural;  --  Should always be zero!
---           Data_2 : Natural;  --  Octet_2
---           Data_1 : Natural;  --  Octet_Continuation
---        end record with
---       Convention => C,
---       Size       => Code_Point_Data'Size;
---
---     for Code_Point_2 use
---        record
---           Zero   at 0 range 11 .. 31;
---           Data_2 at 0 range  6 .. 10;
---           Data_1 at 0 range  0 ..  5;
---        end record;
---
---     type Code_Point_3 is
---        record
---           Zero   : Natural;  --  Should always be zero!
---           Data_3 : Natural;  --  Octet_3
---           Data_2 : Natural;  --  Octet_Continuation
---           Data_1 : Natural;  --  Octet_Continuation
---        end record with
---       Convention => C,
---       Size       => Code_Point_Data'Size;
---
---     for Code_Point_3 use
---        record
---           Zero   at 0 range 16 .. 31;
---           Data_3 at 0 range 12 .. 15;
---           Data_2 at 0 range  6 .. 11;
---           Data_1 at 0 range  0 ..  5;
---        end record;
---
---     type Code_Point_4 is
---        record
---           Zero   : Natural;  --  Should always be zero!
---           Data_4 : Natural;  --  Octet_4
---           Data_3 : Natural;  --  Octet_Continuation
---           Data_2 : Natural;  --  Octet_Continuation
---           Data_1 : Natural;  --  Octet_Continuation
---        end record with
---       Convention => C,
---       Size       => Code_Point_Data'Size;
---
---     for Code_Point_4 use
---        record
---           Zero   at 0 range 21 .. 31;
---           Data_4 at 0 range 18 .. 20;
---           Data_3 at 0 range 12 .. 17;
---           Data_2 at 0 range  6 .. 11;
---           Data_1 at 0 range  0 ..  5;
---        end record;
---
---     type Code_Points_Kinds is (One, Two, Three, Four, Code_Point);
---
---     type Code_Points (Kind : Code_Points_Kinds) is
---        record
---           case Kind is
---           when One =>
---              Code : Code_Point_1;
---
---           when Two =>
---              Code : Code_Point_2;
---
---           when Three =>
---              Code : Code_Point_3;
---
---           when Four =>
---              Code : Code_Point_4;
---
---           when Code_Points =>
---              Code : Code_Point_Data;
---           end case;
---        end record with
---       Convention => C,
---       Size       => Code_Point_Data'Size;
---
---     --     type ASCII_Range is new Octet range 0 .. 16#7F#;
---
---     function "&" (Left : in Unicode_String; Right : in Code_Point) return Unicode_String;
---     function "&" (Left : in Code_Point; Right : in Unicode_String) return Unicode_String;
---
---     function "&" (Left : in Unicode_String; Right : in Character) return Unicode_String;
---     function "&" (Left : in Character; Right : in Unicode_String) return Unicode_String;
-   --  private
+   --  Mask to get the data from an octet.
+   Octet_Data_Mask_One          : constant Octets := 2#0111_1111#;
+   Octet_Data_Mask_Two          : constant Octets := 2#0001_1111#;
+   Octet_Data_Mask_Three        : constant Octets := 2#0000_1111#;
+   Octet_Data_Mask_Four         : constant Octets := 2#0000_0111#;
+   Octet_Data_Mask_Follower     : constant Octets := 2#0011_1111#;
+
+   type Unicode_Cursor is record
+      Container  : access constant Unicode_String;
+      Index      : Natural;
+      Next_Index : Natural;
+      Code       : Code_Points;
+   end record;
+
+   No_Element : constant Unicode_Cursor := (Container => null, Code => 0, others => Natural'First);
+
+   type Unicode_Iterator is new Unicode_Iterators.Forward_Iterator with record
+      Container : access constant Unicode_String;
+   end record;
+
+   overriding
+   function First (Object : in Unicode_Iterator) return Unicode_Cursor;
+
+   overriding
+   function Next (Object : in Unicode_Iterator; Position : in Unicode_Cursor) return Unicode_Cursor;
 end UCA;

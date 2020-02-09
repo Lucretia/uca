@@ -14,4 +14,5 @@ package UCA.Tests is
    procedure Initialize (T : in out Test);
 private
    procedure Test_Octets;
+   procedure Test_Iterator;
 end UCA.Tests;
