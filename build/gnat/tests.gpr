@@ -8,4 +8,7 @@ project Tests is
    for Main        use ("uca-test_runner.adb");
 
    package Compiler renames UCA.Compiler;
+   -- package Compiler is
+   --    for Default_Switches ("Ada") use UCA.Compiler.Ada_Switches & ("-gnatWb");
+   -- end Compiler;
 end Tests;
