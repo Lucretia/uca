@@ -28,3 +28,5 @@ FSF GNAT 9.2.0
 Copyright (C) 2020, Luke A. Guest
 
 # Licence
+
+MPL 2.0
