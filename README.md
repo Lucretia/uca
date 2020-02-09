@@ -1,6 +1,6 @@
 # UCA - Unicode Components for Ada
 
-This is an Ada 2012 library that implements [https://www.unicode.org/versions/latest/](Unicode v12.1.0).
+This is an Ada 2012 library that implements [Unicode v12.1.0](https://www.unicode.org/versions/latest).
 
 UCA is split up into components that can be linked only if required, the base library provides support for definite
 string types, everything else is built on top of this. The libraries try to match the Ada standard for the other string
