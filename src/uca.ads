@@ -29,13 +29,9 @@ package UCA is
    --    See 3.9 of the standard for the range.
    --      The range is 0 .. 10_FFFF
    type Code_Points is new All_Code_Points with
-     Static_Predicate => Code_Points in 0 .. 16#0000_D7FF# or Code_Points in 16#0000_E000# .. 16#0010_FFFF#,
+     Static_Predicate => All_Code_Points (Code_Points) not in High_Surrogates and
+                         All_Code_Points (Code_Points) not in Low_Surrogates,
      Size             => 32;
-   -- type Code_Points is new All_Code_Points with
-   --   Static_Predicate => All_Code_Points (Code_Points) in 0 .. High_Surrogates'First - 1 or
-   --                       All_Code_Points (Code_Points) in Low_Surrogates'Last - 1 .. 16#0010_FFFF#,
-   --   Size             => 32;
-
 private
    --  No. of bytes | Bits for code point | First   | Last     |  Byte 1  |  Byte 2  |  Byte 3  |  Byte 4
    --        1      |           7         | U+0000  | U+007F   | 0wwwwwww |
