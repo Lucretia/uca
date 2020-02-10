@@ -5,8 +5,9 @@
 --  License, v. 2.0. If a copy of the MPL was not distributed with this
 --  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ------------------------------------------------------------------------------------------------------------------------
--- with Ada.Unchecked_Conversion;
+with Ada.Unchecked_Conversion;
 with Ada.Iterator_Interfaces;
+with Ada.Strings.UTF_Encoding;
 
 package UCA is
    -- pragma Preelaborate;
@@ -56,6 +57,9 @@ package UCA is
 
    function Element (Position : in Unicode_Cursor) return Code_Points;
 
+   --  TODO: Should this use Encode?
+   function "&" (Left : in Ada.Strings.UTF_Encoding.UTF_String; Right : in Unicode_String) return Unicode_String;
+   function "&" (Left : in Unicode_String; Right : in Ada.Strings.UTF_Encoding.UTF_String) return Unicode_String;
 private
    --  No. of bytes | Bits for code point | First   | Last     |  Byte 1  |  Byte 2  |  Byte 3  |  Byte 4
    --        1      |           7         | U+0000  | U+007F   | 0wwwwwww |
@@ -108,4 +112,7 @@ private
 
    overriding
    function Next (Object : in Unicode_Iterator; Position : in Unicode_Cursor) return Unicode_Cursor;
+
+   function Convert is new Ada.Unchecked_Conversion (Source => Octets, Target => Character);
+   function Convert is new Ada.Unchecked_Conversion (Source => Character, Target => Octets);
 end UCA;

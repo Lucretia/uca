@@ -88,5 +88,11 @@ package body UCA.Tests is
 
       Ahven.Assert (Condition => Hindi = "मैं काँच खा सकता हूँ और मुझे उससे कोई चोट नहीं पहुंचती",
                     Message   => "Hindi: " & Error);
+
+      Ahven.Assert (Condition => "Hindi: " & Hindi = "Hindi: मैं काँच खा सकता हूँ और मुझे उससे कोई चोट नहीं पहुंचती",
+                    Message   => "Hindi: Prepend failed");
+
+      Ahven.Assert (Condition => Hindi & " Blah" = "मैं काँच खा सकता हूँ और मुझे उससे कोई चोट नहीं पहुंचती Blah",
+                    Message   => "Hindi: Append failed");
    end Test_Iterator;
 end UCA.Tests;

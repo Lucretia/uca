@@ -30,6 +30,44 @@ package body UCA is
       return Position.Code;
    end Element;
 
+   function "&" (Left : in Ada.Strings.UTF_Encoding.UTF_String; Right : in Unicode_String) return Unicode_String is
+      Result : Unicode_String (1 .. Left'Length + Right'Length);
+      Index  : Positive := Positive'First;
+   begin
+      for C of Left loop
+         Result (Index) := Convert (C);
+
+         Index := Index + 1;
+      end loop;
+
+      for C of Right loop
+         Result (Index) := C;
+
+         Index := Index + 1;
+      end loop;
+
+      return Result;
+   end "&";
+
+   function "&" (Left : in Unicode_String; Right : in Ada.Strings.UTF_Encoding.UTF_String) return Unicode_String is
+      Result : Unicode_String (1 .. Left'Length + Right'Length);
+      Index  : Positive := Positive'First;
+   begin
+      for C of Left loop
+         Result (Index) := C;
+
+         Index := Index + 1;
+      end loop;
+
+      for C of Right loop
+         Result (Index) := Convert (C);
+
+         Index := Index + 1;
+      end loop;
+
+      return Result;
+   end "&";
+
    function Parse_UTF_8 (First : in Octets) return Code_Points is
    begin
       return Code_Points (First);
