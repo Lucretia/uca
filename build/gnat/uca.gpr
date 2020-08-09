@@ -1,5 +1,5 @@
 library project UCA is
-   Version := "0.0.7";
+   Version := "0.0.8";
 
    --  type Build_Type is ("linux", "bsd", "windows", "macosx");
    type Mode_Type is ("debug", "release");

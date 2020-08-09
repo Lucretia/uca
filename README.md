@@ -23,6 +23,10 @@ Ada 2012 compiler.
 
 FSF GNAT 9.2.0
 
+## [Current version](http://www.semver.org)
+
+v0.0.8
+
 # Copyright
 
 Copyright (C) 2020, Luke A. Guest
