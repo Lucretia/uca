@@ -1,3 +1,10 @@
+------------------------------------------------------------------------------------------------------------------------
+--  Copyright © 2020, Luke A. Guest
+--
+--  This Source Code Form is subject to the terms of the Mozilla Public
+--  License, v. 2.0. If a copy of the MPL was not distributed with this
+--  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+------------------------------------------------------------------------------------------------------------------------
 with Ada.Text_IO;       use Ada.Text_IO;
 with Ada.Strings.Fixed; use Ada.Strings.Fixed;
 with Interfaces;        use Interfaces;
@@ -67,6 +74,22 @@ package body UCA is
 
       return Result;
    end "&";
+
+   function "&" (Left : in Ada.Strings.UTF_Encoding.UTF_String; Right : in Octets) return Unicode_String is
+      Right_String : Unicode_String (1 .. 1) := (1 => Right);
+   begin
+      return Left & Right_String;
+   end "&";
+
+   function "+" (Item : in String) return Unicode_String is
+      Result : Unicode_String (1 .. Item'Length);
+   begin
+      for Index in Item'Range loop
+         Result (Index) := Convert (Item (Index));
+      end loop;
+
+      return Result;
+   end "+";
 
    function Parse_UTF_8 (First : in Octets) return Code_Points is
    begin

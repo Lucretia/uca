@@ -60,6 +60,12 @@ package UCA is
    --  TODO: Should this use Encode?
    function "&" (Left : in Ada.Strings.UTF_Encoding.UTF_String; Right : in Unicode_String) return Unicode_String;
    function "&" (Left : in Unicode_String; Right : in Ada.Strings.UTF_Encoding.UTF_String) return Unicode_String;
+
+   function "&" (Left : in Ada.Strings.UTF_Encoding.UTF_String; Right : in Octets) return Unicode_String with
+     Inline;
+
+   function "+" (Item : in String) return Unicode_String with
+     Inline;
 private
    --  No. of bytes | Bits for code point | First   | Last     |  Byte 1  |  Byte 2  |  Byte 3  |  Byte 4
    --        1      |           7         | U+0000  | U+007F   | 0wwwwwww |
