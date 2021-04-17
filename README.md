@@ -25,7 +25,7 @@ FSF GNAT 9.2.0
 
 ## [Current version](http://www.semver.org)
 
-v0.0.8
+v0.0.10
 
 # Copyright
 
