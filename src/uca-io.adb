@@ -9,19 +9,24 @@ with Ada.Text_IO;
 
 package body UCA.IO is
    procedure Put (Item : in Unicode_String) is
+      subtype Ranged_String is String (Item'Range);
+      subtype Ranged_UString is Unicode_String (1 .. Item'Last);
+
+      function Convert is new Ada.Unchecked_Conversion
+         (Source => Ranged_UString, Target => Ranged_String);
    begin
-      for C of Item loop
-         Ada.Text_IO.Put (Convert (C));
-      end loop;
+      Ada.Text_IO.Put (Convert (Item));
    end Put;
 
 
    procedure Put_Line (Item : in Unicode_String) is
-   begin
-      for C of Item loop
-         Ada.Text_IO.Put (Convert (C));
-      end loop;
+      subtype Ranged_String is String (Item'Range);
+      subtype Ranged_UString is Unicode_String (1 .. Item'Last);
 
+      function Convert is new Ada.Unchecked_Conversion
+         (Source => Ranged_UString, Target => Ranged_String);
+   begin
+      Ada.Text_IO.Put (Convert (Item));
       Ada.Text_IO.New_Line;
    end Put_Line;
 end UCA.IO;
