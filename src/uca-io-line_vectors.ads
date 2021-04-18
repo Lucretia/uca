@@ -17,7 +17,8 @@ package UCA.IO.Line_Vectors is
    type New_Line is new Root_Line with null record;
 
    type Text_Line (Length : Positive) is new Root_Line with record
-      Text : Unicode_String (1 .. Length);
+      Text        : Unicode_String (1 .. Length);
+      Indentation : Natural;
    end record;
 
    package Line_Vector is new Ada.Containers.Indefinite_Vectors
