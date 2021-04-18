@@ -10,7 +10,7 @@ with Ada.Iterator_Interfaces;
 with Ada.Strings.UTF_Encoding;
 
 package UCA is
-   -- pragma Preelaborate;
+   pragma Elaborate_Body;
 
    Unicode_Parse_Error : exception;
 

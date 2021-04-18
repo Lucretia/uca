@@ -7,7 +7,6 @@
 ------------------------------------------------------------------------------------------------------------------------
 with Ada.Characters.Latin_1;
 with Ada.Unchecked_Conversion;
--- with Ada.Strings.UTF_Encoding;
 
 package UCA.ANSI is
    Escape              : constant Octets;
