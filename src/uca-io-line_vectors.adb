@@ -28,16 +28,14 @@ package body UCA.IO.Line_Vectors is
                                          Text   => File.Data (Next_First .. Current - 1)));
             end if;
 
-            --  Skip the new line.
-            Current := Current + 1;
-
             --  Is this the EOF?
             if Current < File.Data'Last then
-               Next_First := Current;
+               Next_First := Current + 1;  --  Need to skip past the NL which the increment below will also do.
             end if;
-         else
-            Current := Current + 1;
          end if;
+
+         --  Skip the new line.
+         Current := Current + 1;
       end loop;
 
       return Result;
